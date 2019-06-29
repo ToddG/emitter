@@ -3,8 +3,8 @@ all: build
 
 .PHONY: build
 build: 
-	cd erlang/wavegen && rebar3 do escriptize, eunit
-	cd erlang/wavegen && _build/default/bin/wavegen
+	cd wavegen && rebar3 do escriptize, eunit
+	cd wavegen && _build/default/bin/wavegen
 
 #.PHONY: monitor_start
 #monitor_start: 

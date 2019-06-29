@@ -1,2 +1,4 @@
 # emitter
-Test metrics emitter for things like Prometheus Metric Events
+Test metrics emitter.
+
+* emits metrics using https://github.com/deadtrickster/prometheus.erl
