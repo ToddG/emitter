@@ -12,11 +12,13 @@ main(Args) ->
     io:format("Args: ~p~n", [Args]),
     prometheus:start(),
     register_metrics(),
-    [tick(500, F, 0) || F <- [fun flatline/1, fun flipflop/1, fun sinewave/1, fun incrementer/1]],
+    CancelFuns = [tick(10, F, 0) || F <- [fun flatline/1, fun flipflop/1, fun sinewave/1, fun incrementer/1, fun watcher/1]],
     %% this never get's called
     receive
         {ok} -> ok
     end,
+    %% cancel all the timers
+    [F() || F <- CancelFuns],
     erlang:halt(0).
 
 %%====================================================================
@@ -28,11 +30,10 @@ main(Args) ->
 %% this must be done prior to using metrics
 %%--------------------------------------------------------------------
 register_metrics() ->
-    prometheus_counter:new([{name, mycounter}, {help, "count the times each method has been invoked"}, {labels, [flatline, incrementer, flipflop, sinewave]}]),
-    prometheus_gauge:new([{name, myguage}, {help, "current value of a method"}, {labels, [flatline, incrementer, flipflop, sinewave]}]),
-    prometheus_summary:new([{name, mysummary}, {help, "summary of a method"}, {labels, [flatline, incrementer, flipflop, sinewave]}]),
-    prometheus_histogram:new([{name, myhist}, {help, "hist of a method"}, {labels, [method]},
-                              {buckets, [10, 100, 1000, 100000, 1000000]}]),
+    prometheus_counter:new(     [{name, mycounter},     {help, "count the times each method has been invoked"},     {labels, [method]}]),
+    prometheus_gauge:new(       [{name, myguage},       {help, "current value of a method"},                        {labels, [method]}]),
+    prometheus_summary:new(     [{name, mysummary},     {help, "summary of a method"},                              {labels, [method]}]),
+    prometheus_histogram:new(   [{name, myhist},        {help, "hist of a method"},                                 {labels, [method]},     {buckets, [1, 2, 4, 8, 10, 100, 1000]}]),
     ok.
 
 %%--------------------------------------------------------------------
@@ -41,16 +42,27 @@ register_metrics() ->
 %% grafana dashboard
 %%--------------------------------------------------------------------
 multimetric(Label, Value) ->
-    prometheus_counter:inc(mycounter, [Label], Value),
+    %% counter for times the method has been invoked
+    prometheus_counter:inc(mycounter, [Label], 1),
+    % set a gauge to the current value
     prometheus_gauge:set(myguage, [Label], Value),
+    % no idea
     prometheus_summary:observe(mysummary, [Label], Value),
+    % no idea
     prometheus_histogram:observe(myhist, [Label], Value).
+
+
+%%--------------------------------------------------------------------
+%% watcher : dump metrics
+%%--------------------------------------------------------------------
+watcher(_) ->
+    io:format(prometheus_text_format:format()).
 
 %%--------------------------------------------------------------------
 %% emit : side-effect for the function F
 %%--------------------------------------------------------------------
 emit(Name, Value) -> 
-    io:format("emit: [~p]~p~n", [Name, Value]),
+    %%io:format("emit: [~p]~p~n", [Name, Value]),
     multimetric(Name, Value).
 
 
