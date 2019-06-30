@@ -2,6 +2,7 @@
 
 %% API exports
 -export([main/1]).
+-mode(compile).
 
 %%====================================================================
 %% API functions
@@ -10,9 +11,10 @@
 %% escript Entry point
 main(Args) ->
     io:format("Args: ~p~n", [Args]),
+    {ok, _} = elli:start_link([{callback, elli_minimal_callback}, {port, 4444}]),
     prometheus:start(),
     register_metrics(),
-    CancelFuns = [tick(10, F, 0) || F <- [fun flatline/1, fun flipflop/1, fun sinewave/1, fun incrementer/1, fun watcher/1]],
+    CancelFuns = [tick(10, F, 0) || F <- [fun flatline/1, fun flipflop/1, fun sinewave/1, fun incrementer/1]],
     %% this never get's called
     receive
         {ok} -> ok

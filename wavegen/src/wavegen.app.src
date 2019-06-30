@@ -5,8 +5,8 @@
   {applications,
    [kernel,
     stdlib,
+    elli,
     prometheus
-%%    cowboy
    ]},
   {env,[]},
   {modules, []},

@@ -17,6 +17,11 @@ services:
       - ${CURRENT_DIRECTORY}/config/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
 
+  wavegen:
+    image: toddg/erlang-wavegen
+    ports:
+      - "4444:4444"
+
 # for persistent data
 volumes:
   prometheus_data:
