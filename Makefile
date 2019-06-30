@@ -19,6 +19,14 @@ start: build
 build:  
 	docker build -t toddg/erlang-wavegen .
 
+.PHONY: log
+log: 
+	cd monitor && docker-compose logs -f --tail="all"
+
+.PHONY: rebuild
+rebuild:  
+	docker build -t toddg/erlang-wavegen . --no-cache=true
+
 .PHONY: stop
 stop: monitor_stop
 

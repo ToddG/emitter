@@ -1,5 +1,5 @@
 # ubuntu-rebar includes erlang
-FROM envirosoftwaresolutions/ubuntu-rebar:latest as LAYER0
+FROM envirosoftwaresolutions/ubuntu-rebar:0.0.9
 
 # set working directory
 RUN mkdir -p /build
@@ -17,4 +17,4 @@ RUN rebar3 do clean, compile, escriptize, eunit
 # serving metrics on port  
 EXPOSE 4444
 
-CMD ["/build/wavegen/_build/default/bin/wavegen"]
+ENTRYPOINT ["/bin/bash", "-l", "-c", "/build/wavegen/_build/default/bin/wavegen"]
