@@ -48,9 +48,9 @@ multimetric(Label, Value) ->
     prometheus_counter:inc(mycounter, [Label], 1),
     % set a gauge to the current value
     prometheus_gauge:set(myguage, [Label], Value),
-    % no idea
+    % set the summary to the current value
     prometheus_summary:observe(mysummary, [Label], Value),
-    % no idea
+    % set the histogram to the current value
     prometheus_histogram:observe(myhist, [Label], Value).
 
 
